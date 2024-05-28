@@ -2,15 +2,28 @@ const keys = document.querySelectorAll('.key');
 const display = document.querySelector('.main-display');
 const smallDisplay = document.querySelector('.small-display');
 const clear = document.querySelector('.clear');
-let num1 = 0;
-let num2 = 0;
+let numArr1 = [];
+let numArr2 = [];
 let result = 0;
 let operator;
 let textLimit = false;
 let operatorInput = false;
 let firstCalculation = false;
 
+function arrToNumber(array) {
+    return Number(array.join(''));
+}
+
 function calculation(a, b, o) {
+    if (!Array.isArray(a) && Array.isArray(b)) {
+        console.log("inside calc if")
+        b = arrToNumber(b);
+    } else if (Array.isArray(a) && Array.isArray(b)) {
+        console.log("inside calc else if")
+        a = arrToNumber(a);
+        b = arrToNumber(b);
+    }
+    
     switch (o) {
         case '+':
             return a + b;
@@ -35,50 +48,42 @@ clear.addEventListener('click', () => {
     textLimit = false;
     operatorInput = false;
     firstCalculation = false;
-    num1 = 0;
-    num2 = 0;
+    numArr1 = [];
+    numArr2 = [];
     result = 0;
     operator = '';
 });
 
 Array.from(keys).forEach((key) => {
     key.addEventListener('click', () => {
-        key.style.animation = 'keystroke 0.2s linear';
-        setInterval(() => {
-            key.style.animation = '';
-        }, 200);
-        if (display.textContent.length > 11) {
+        if (display.textContent.length >= 11) {
             textLimit = true;
         } else if(!textLimit) {
             display.innerHTML += key.innerHTML;
-            if (!isNaN(key.textContent) && !operatorInput) {
-                num1 += Number(key.textContent);
-                num1 *= 10;
-            } else if (num1 !== 0) {
-                if (!isNaN(key.textContent)) {
-                    num2 += Number(key.textContent);
-                    num2 *= 10;
-                }
+            if (!operatorInput && !isNaN(key.textContent)) {
+                numArr1.push(key.textContent);
+            } else if (!isNaN(key.textContent)) {
+                numArr2.push(key.textContent);
             }
         }
-        if (['+', '-', '*', '/'].includes(key.innerHTML)) {
+        if (['+', '-', '*', '/'].includes(key.textContent)) {
             operatorInput = true;
             textLimit = false;
             operator = key.innerHTML;
-            display.innerHTML = "";
-            smallDisplay.innerHTML += num1/10 + operator;
+            display.textContent = "";
+            smallDisplay.innerHTML += numArr1.join('') + operator;
         }
-        if (key.innerHTML === '=') {
+        if (key.textContent === '=') {
             operatorInput = true;
             textLimit = false;
             if (!firstCalculation) {
-                result = calculation(num1/10, num2/10, operator);
+                result = calculation(numArr1, numArr2, operator);
                 firstCalculation = true;
             } else {
-                result = calculation(result, num2/10, operator);
+                result = calculation(result, numArr2, operator);
             }
             display.textContent = result;
-            smallDisplay.textContent += num2/10 + operator;
+            smallDisplay.textContent += numArr2 + operator;
         }
     });
 });
