@@ -15,11 +15,9 @@ function arrToNumber(array) {
 }
 
 function calculation(a, b, o) {
-    if (!Array.isArray(a) && Array.isArray(b)) {
-        console.log("inside calc if")
+    if (!Array.isArray(a) && Array.isArray(b)) { //if a != array and b = array
         b = arrToNumber(b);
-    } else if (Array.isArray(a) && Array.isArray(b)) {
-        console.log("inside calc else if")
+    } else if (Array.isArray(a) && Array.isArray(b)) { //if a and b are both array
         a = arrToNumber(a);
         b = arrToNumber(b);
     }
@@ -35,14 +33,14 @@ function calculation(a, b, o) {
             return a * b;
         
         case '/':
-            return (b !== 0) ? a / b : 'Error';
+            return (b !== 0) ? a / b : 'Invalid';
 
         default:
             return 0;
     }
 }
 
-clear.addEventListener('click', () => {
+clear.addEventListener('click', () => { //reset everything to default
     display.textContent = '';
     smallDisplay.textContent = '';
     textLimit = false;
@@ -60,9 +58,9 @@ Array.from(keys).forEach((key) => {
             textLimit = true;
         } else if(!textLimit) {
             display.innerHTML += key.innerHTML;
-            if (!operatorInput && !isNaN(key.textContent)) {
+            if (!operatorInput && /[0-9.]/g.test(key.textContent)) { //the values entered before operator
                 numArr1.push(key.textContent);
-            } else if (!isNaN(key.textContent)) {
+            } else if (/[0-9.]/g.test(key.textContent)) { //the values after the operatored is entered
                 numArr2.push(key.textContent);
             }
         }
@@ -76,6 +74,7 @@ Array.from(keys).forEach((key) => {
         if (key.textContent === '=') {
             operatorInput = true;
             textLimit = false;
+            console.log(numArr2)
             if (!firstCalculation) {
                 result = calculation(numArr1, numArr2, operator);
                 firstCalculation = true;
@@ -83,7 +82,7 @@ Array.from(keys).forEach((key) => {
                 result = calculation(result, numArr2, operator);
             }
             display.textContent = result;
-            smallDisplay.textContent += numArr2 + operator;
+            smallDisplay.textContent += `${numArr2.join('')}${operator}`;
         }
     });
 });
